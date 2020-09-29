@@ -133,13 +133,16 @@ public class HbaseLogTest {
 
 /*
  * git token
- * 9a6cd2442a963bf89b9c225b9a87f22c222e1703
+ * 1e40c9b3dd907cee4f99ecd966e581d9488b9961
  *
  * GIT项目
  * https://github.com/apollyon0728/flink-recommandSystem-demo
  *
  * 【Hbase技术详细学习笔记】，还不错
  * https://www.jianshu.com/p/569106a3008f
+ *
+ * 【HBase深入浅出】 还不错
+ * https://developer.ibm.com/zh/articles/ba-cn-bigdata-hbase/
  *
  *
  * HBase更像是数据存储，支持PB级别数据
