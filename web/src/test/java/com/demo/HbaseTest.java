@@ -203,4 +203,14 @@ public class HbaseTest {
  *
  * 二级索引
  * https://www.cnblogs.com/kxdblog/p/4328699.html
+ *
+ * 使用hive查询hbase
+ * https://www.pianshen.com/article/381227758/
+ *
+ * HBASE LSM算法
+ * https://www.cnblogs.com/niutao/p/10627217.html
+ *
+ * Phoenix
+ * https://www.cnblogs.com/funyoung/p/10249115.html
+ * https://blog.csdn.net/qq_33187206/article/details/80824414
  */

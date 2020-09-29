@@ -76,8 +76,14 @@ public class HbaseLogTest {
      */
     @Test
     public void insertLogInfoTest() throws IOException {
-        String erp = "zhangsan";
-        for (int index = 0; index< 1000; index++) {
+//        String erp = "zhangsan";
+
+        // 2020-09-29 18:17:56
+//        String erp = "lisi";
+
+        // 2020-09-29 18:24:08
+        String erp = "wangwu";
+        for (int index = 0; index< 100000; index++) {
             String timeStr = String.valueOf(new Date().getTime());
             LogInfo logInfo = new LogInfo();
             // CF 为 info
@@ -113,16 +119,31 @@ public class HbaseLogTest {
      */
     @Test
     public void getLogListTestByCreatTime() throws IOException {
+        // 在这个时间范围写入了数据，create_time取了系统时间
         String sTime = "2020-09-29 16:46:54";
         String eTime = "2020-09-29 16:46:55";
         List<LogInfo> logInfoList = HbaseClient.getLogListByCreatTime("log_table", "zhangsan-", sTime, eTime);
         System.out.println(">>>>>> getUserListTest getUserListTest: " + JSONObject.toJSONString(logInfoList));
     }
 
-
 }
 
-/**
+
+
+
+/*
  * git token
  * 9a6cd2442a963bf89b9c225b9a87f22c222e1703
+ *
+ * GIT项目
+ * https://github.com/apollyon0728/flink-recommandSystem-demo
+ *
+ * 【Hbase技术详细学习笔记】，还不错
+ * https://www.jianshu.com/p/569106a3008f
+ *
+ *
+ * HBase更像是数据存储，支持PB级别数据
+ *
+ * 大数据
+ * https://github.com/apollyon0728/God-Of-BigData#%E4%BA%94hbase
  */
