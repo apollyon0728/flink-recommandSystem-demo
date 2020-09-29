@@ -122,3 +122,7 @@ public class HbaseLogTest {
 
 }
 
+/**
+ * git token
+ * 9a6cd2442a963bf89b9c225b9a87f22c222e1703
+ */
