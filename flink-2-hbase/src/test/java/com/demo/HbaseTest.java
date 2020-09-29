@@ -28,6 +28,5 @@ public class HbaseTest {
 		for (Result r : scanner) {
 			System.out.println(new String(r.getRow()));
 		}
-
 	}
 }

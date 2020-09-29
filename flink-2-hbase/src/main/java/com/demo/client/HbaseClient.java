@@ -20,6 +20,7 @@ public class HbaseClient {
         conf.set("hbase.client.scanner.timeout.period", Property.getStrValue("hbase.client.scanner.timeout.period"));
         conf.set("hbase.rpc.timeout", Property.getStrValue("hbase.rpc.timeout"));
         try {
+            System.setProperty("hadoop.home.dir", "G:\\download\\hadoop2.6_Win_x64-master");
             conn = ConnectionFactory.createConnection(conf);
             admin = conn.getAdmin();
         } catch (IOException e) {
@@ -34,8 +35,8 @@ public class HbaseClient {
         }else{
         System.out.println("Start create table");
         HTableDescriptor tableDescriptor = new HTableDescriptor(tablename);
-        for (String columnFamliy : columnFamilies) {
-            HTableDescriptor column = tableDescriptor.addFamily(new HColumnDescriptor(columnFamliy));
+        for (String columnFamily : columnFamilies) {
+            HTableDescriptor column = tableDescriptor.addFamily(new HColumnDescriptor(columnFamily));
         }
         admin.createTable(tableDescriptor);
         System.out.println("Create Table success");
@@ -46,17 +47,17 @@ public class HbaseClient {
      * 获取一列获取一行数据
      * @param tableName
      * @param rowKey
-     * @param famliyName
+     * @param familyName
      * @param column
      * @return
      * @throws IOException
      */
-    public static String getData(String tableName, String rowKey, String famliyName, String column) throws IOException {
+    public static String getData(String tableName, String rowKey, String familyName, String column) throws IOException {
         Table table = conn.getTable(TableName.valueOf(tableName));
         byte[] row = Bytes.toBytes(rowKey);
         Get get = new Get(row);
         Result result = table.get(get);
-        byte[] resultValue = result.getValue(famliyName.getBytes(), column.getBytes());
+        byte[] resultValue = result.getValue(familyName.getBytes(), column.getBytes());
         if (null == resultValue){
             return null;
         }
@@ -94,35 +95,35 @@ public class HbaseClient {
 
     /**
      * 向对应列添加数据
-     * @param tablename 表名
-     * @param rowkey 行号
-     * @param famliyname 列族名
+     * @param tableName 表名
+     * @param rowKey 行号
+     * @param familyName 列族名
      * @param column 列名
      * @param data 数据
      * @throws Exception
      */
-    public static void putData(String tablename, String rowkey, String famliyname,String column,String data) throws Exception {
-        Table table = conn.getTable(TableName.valueOf(tablename));
-        Put put = new Put(rowkey.getBytes());
-        put.addColumn(famliyname.getBytes(),column.getBytes(),data.getBytes());
+    public static void putData(String tableName, String rowKey, String familyName, String column, String data) throws Exception {
+        Table table = conn.getTable(TableName.valueOf(tableName));
+        Put put = new Put(rowKey.getBytes());
+        put.addColumn(familyName.getBytes(),column.getBytes(),data.getBytes());
         table.put(put);
     }
 
     /**
      * 将该单元格加1
-     * @param tablename 表名
-     * @param rowkey 行号
-     * @param famliyname 列族名
+     * @param tableName 表名
+     * @param rowKey 行号
+     * @param familyName 列族名
      * @param column 列名
      * @throws Exception
      */
-    public static void increamColumn(String tablename, String rowkey, String famliyname,String column) throws Exception {
-        String val = getData(tablename, rowkey, famliyname, column);
+    public static void increaseColumn(String tableName, String rowKey, String familyName, String column) throws Exception {
+        String val = getData(tableName, rowKey, familyName, column);
         int res = 1;
         if (val != null) {
             res = Integer.valueOf(val) + 1;
         }
-        putData(tablename, rowkey, famliyname, column, String.valueOf(res));
+        putData(tableName, rowKey, familyName, column, String.valueOf(res));
     }
 
     public static void main(String[] args) throws IOException {
@@ -146,5 +147,25 @@ public class HbaseClient {
 		}
 		return keys;
 	}
+
+    /**
+     * 删除表
+     * @param tableName
+     * @throws IOException
+     */
+	public static void deleteTable(String tableName) throws IOException {
+        TableName tablename = TableName.valueOf(tableName);
+        if(admin.tableExists(tablename)){
+            System.out.println("Table Exists");
+
+            // org.apache.hadoop.hbase.TableNotDisabledException
+            // 删除前需要先禁用
+            admin.disableTable(tablename);
+
+            admin.deleteTable(tablename);
+
+            System.out.println(tablename + " Table is deleted");
+        }
+    }
 
 }
