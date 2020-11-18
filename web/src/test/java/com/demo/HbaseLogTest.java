@@ -35,7 +35,7 @@ public class HbaseLogTest {
      */
     @Test
     public void testCreateTable() throws IOException {
-        // 创建user_table表
+        // 创建user_table表，设置CF
         HbaseClient.createTable("log_table", new String[]{ "info", "msg" });
     }
 

@@ -8,10 +8,11 @@ import org.apache.flink.util.Collector;
 
 public class WindowResultFunction
         implements WindowFunction<Long, TopProductEntity, Tuple, TimeWindow> {
+
     @Override
     public void apply(Tuple key, TimeWindow window, Iterable<Long> aggregateResult, Collector<TopProductEntity> collector) throws Exception {
-		int itemId = key.getField(0);
-		Long count = aggregateResult.iterator().next();
-        collector.collect(TopProductEntity.of(itemId,window.getEnd(),count));
+        int itemId = key.getField(0);
+        Long count = aggregateResult.iterator().next();
+        collector.collect(TopProductEntity.of(itemId, window.getEnd(), count));
     }
 }
