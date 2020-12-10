@@ -1,5 +1,6 @@
 package com.demo;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.alibaba.fastjson.JSON;
 import com.demo.domain.Order;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -60,21 +61,21 @@ public class WindowTopN {
         stream.map(new MapFunction<String, Order>() {
             @Override
             public Order map(String value) throws Exception {
-                /*String[] split = value.split(",");
-                return new Order(split[0], Long.valueOf(split[1]), split[2], Double.valueOf(split[3]), split[4]);*/
                 return JSON.parseObject(value, Order.class);
             }
-        }).assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor<Order>(Time.seconds(1)) {
-            @Override
-            public long extractTimestamp(Order element) {
-                return element.orderTime;
-            }
-        }).keyBy(new KeySelector<Order, String>() {
-            @Override
-            public String getKey(Order value) throws Exception {
-                return value.areaId + value.orderId; //以地区和订单进行分流
-            }
-        }).timeWindow(Time.minutes(1))
+        })
+                .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor<Order>(Time.seconds(1)) {
+                    @Override
+                    public long extractTimestamp(Order element) {
+                        return element.orderTime;
+                    }
+                })
+                .keyBy(new KeySelector<Order, String>() {
+                    @Override
+                    public String getKey(Order value) throws Exception {
+                        return value.areaId + value.orderId; //以地区和订单进行分流
+                    }
+                }).timeWindow(Time.minutes(1))
                 .reduce(new ReduceFunction<Order>() {
                     @Override
                     public Order reduce(Order value1, Order value2) throws Exception {
@@ -89,11 +90,11 @@ public class WindowTopN {
                 }) //并按地区分流，下面第一个要做怎么获取上个10分钟窗口的数据
                 //最简单的是重写设个同样大小的窗口，之所以可以这样简单理解上一个watermark触发窗口执行，输出了窗口的数据再发送的watermark
                 //和hot-items的处理思路不一样
-                .timeWindow(Time.minutes(2))
+                .timeWindow(Time.minutes(2)) // 这里改成了1分钟
                 .apply(new WindowFunction<Order, Order, String, TimeWindow>() {
                     @Override
                     public void apply(String key, TimeWindow window, Iterable<Order> input, Collector<Order> out) throws Exception {
-                        //对销售总金额排序，这里主要是实现排序，使用的treeset
+                        //对销售总金额排序，这里主要是实现排序，使用的treeSet
                         //
                         TreeSet<Order> orderTreeSet = new TreeSet<>(new Comparator<Order>() {
                             @Override
@@ -114,8 +115,9 @@ public class WindowTopN {
                                 orderTreeSet.add(order);
                             }
                         }
-                        logger.warn(" orderTreeSet : {}" ,  JSON.toJSONString(orderTreeSet));
+                        logger.warn(" >>>>>>>>>>>>>> orderTreeSet <<<<<<<<<<<<<< : {}", JSON.toJSONString(orderTreeSet));
                         //
+
                         for (Order order : orderTreeSet) {
                             out.collect(order);
                         }

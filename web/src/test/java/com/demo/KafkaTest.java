@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
+import java.util.Random;
 
 
 /**
@@ -123,26 +124,29 @@ public class KafkaTest {
     public void producerOrderTest() throws InterruptedException {
         KafkaProducer<String, String> producer = new KafkaProducer<>(props);
 
+        int j = 1;
         //异步发送20条消息
-        for (int i = 1; i <= 50; i++){
-
+        for (int i = 1; i <= 10; i++){
             String orderId;
             String areaId;
             if (i % 2 == 0) {
-                orderId = "111";
+                orderId  = String.valueOf(new Random().nextInt(20) + 1);
                 areaId = "110103";
             } else {
-                orderId = "222";
+                orderId  = String.valueOf(new Random().nextInt(20) + 1);
                 areaId = "110106";
             }
+            int amount = new Random().nextInt(100) + 1;
 
-            Order order = new Order(orderId, new Date().getTime(), "gdsId".concat(String.valueOf(i)), (double) i, areaId);
+            Order order = new Order(orderId, new Date().getTime(), "gdsId".concat(String.valueOf(i)), (double) amount, areaId);
 
-            ProducerRecord<String, String> record = new ProducerRecord<>("topic_topN", "key" + i, JSON.toJSONString(order));
+            ProducerRecord<String, String> record = new ProducerRecord<>("topic_topN", "key" + j, JSON.toJSONString(order));
             producer.send(record);
 
-            if (i == 50) {
-                i = 0;
+            j++;
+
+            if (i == 10) {
+                i = 1;
                 Thread.sleep(5000);
             }
         }
